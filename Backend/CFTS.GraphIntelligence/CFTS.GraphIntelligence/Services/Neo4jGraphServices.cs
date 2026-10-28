@@ -1,4 +1,5 @@
 ﻿using Neo4j.Driver;
+using CFTS.GraphIntelligence.Models;
 
 namespace CFTS.GraphIntelligence.Services
 {
@@ -70,6 +71,60 @@ namespace CFTS.GraphIntelligence.Services
 
             return transactions;
         }
+
+
+
+        public async Task<List<FinancialPath>> GetFinancialPathsAsync(
+            string startingCompanyId,
+            string endingCompanyId)
+        {
+            List<FinancialPath> financialPaths = new List<FinancialPath>();
+
+            await using var session = _driver.AsyncSession();
+
+            var result = await session.RunAsync(
+                @"MATCH path =
+            (sender:Company {companyId: $startId})
+            -[:SENT]->(:Transaction)
+            -[:RECEIVED_BY]->(:Company)
+            -[:SENT]->(:Transaction)
+            -[:RECEIVED_BY]->
+            (receiver:Company {companyId: $endId})
+
+          RETURN
+            sender.name AS startingCompany,
+            receiver.name AS endingCompany,
+            [node IN nodes(path) |
+                CASE
+                    WHEN node:Company THEN node.name
+                    WHEN node:Transaction THEN node.transactionId
+                END
+            ] AS financialPath",
+                new
+                {
+                    startId = startingCompanyId,
+                    endId = endingCompanyId
+                }
+            );
+
+            var records = await result.ToListAsync();
+
+            foreach (var record in records)
+            {
+                FinancialPath financialPath = new FinancialPath
+                {
+                    StartingCompany = record["startingCompany"].As<string>(),
+                    EndingCompany = record["endingCompany"].As<string>(),
+                    Path = record["financialPath"].As<List<string>>()
+                };
+
+                financialPaths.Add(financialPath);
+            }
+
+            return financialPaths;
+        }
+
+
 
     }
 }
