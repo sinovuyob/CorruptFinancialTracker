@@ -225,9 +225,9 @@ These scenarios demonstrate that the scoring logic responds differently dependin
 
 | Team member | Responsibility |
 |---|---|
-| Person 1 | ASP.NET Core Web API, SQL Server, CRUD operations and backend integration |
-| Person 2 | Neo4j graph modelling, financial transaction analysis, suspicious-pattern detection and risk scoring |
-| Person 3 | Frontend interface, visual presentation and user interactions |
+| Iviwe Bakaqana | ASP.NET Core Web API, SQL Server, CRUD operations and backend integration |
+| Sinovuyo Binase | Neo4j graph modelling, financial transaction analysis, suspicious-pattern detection and risk scoring |
+| Wamashudu Mathavha | Frontend interface, visual presentation and user interactions |
 
 Development is coordinated through GitHub using separate feature branches.
 
