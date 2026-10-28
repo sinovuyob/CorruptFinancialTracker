@@ -6,6 +6,7 @@ type ViewType = 'login' | 'register' | 'forgot' | 'check-email' | 'reset-passwor
 
 export default function Auth() {
   const [view, setView] = useState<ViewType>('login');
+  const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = (e: React.FormEvent) => {
@@ -13,8 +14,34 @@ export default function Auth() {
     navigate('/dashboard');
   };
 
-  const GoogleButton = ({ text }: { text: string }) => (
-    <button type="button" className="w-full flex items-center justify-center gap-3 border border-gray-400 rounded-md py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors">
+  const InputField = ({ type, placeholder, icon: Icon }: any) => {
+    const [show, setShow] = useState(false);
+    const inputType = type === 'password' && show ? 'text' : type;
+    
+    return (
+      <div className="relative">
+        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <Icon className="h-5 w-5 text-gray-400" />
+        </div>
+        <input 
+          type={inputType} 
+          placeholder={placeholder}
+          className="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+        />
+        {type === 'password' && (
+          <div 
+            onClick={() => setShow(!show)}
+            className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer hover:text-blue-600"
+          >
+            <Eye className="h-5 w-5 text-gray-400 hover:text-blue-600" />
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const GoogleButton = ({ text, onClick }: { text: string, onClick?: () => void }) => (
+    <button type="button" onClick={onClick} className="w-full flex items-center justify-center gap-3 border border-gray-400 rounded-md py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors">
       <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
         <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
@@ -23,24 +50,6 @@ export default function Auth() {
       </svg>
       {text}
     </button>
-  );
-
-  const InputField = ({ type, placeholder, icon: Icon }: { type: string, placeholder: string, icon: React.ElementType }) => (
-    <div className="relative">
-      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-        <Icon className="h-5 w-5 text-gray-400" />
-      </div>
-      <input 
-        type={type} 
-        placeholder={placeholder}
-        className="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
-      />
-      {type === 'password' && (
-        <div className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer">
-          <Eye className="h-5 w-5 text-gray-400" />
-        </div>
-      )}
-    </div>
   );
 
   const LoginScreen = () => (
@@ -74,9 +83,9 @@ export default function Auth() {
           Log in
         </button>
 
-        <div className="flex items-center gap-3 py-2">
-          <div className="relative flex items-center w-10 h-5 bg-gray-200 rounded-full cursor-pointer">
-            <div className="absolute left-1 w-3.5 h-3.5 bg-white rounded-full shadow-sm"></div>
+        <div className="flex items-center gap-3 py-2 cursor-pointer" onClick={() => setRememberMe(!rememberMe)}>
+          <div className={`relative inline-flex h-5 w-10 shrink-0 items-center rounded-full transition-colors ${rememberMe ? 'bg-blue-600' : 'bg-gray-200'}`}>
+            <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition ${rememberMe ? 'translate-x-5' : 'translate-x-1'}`}></span>
           </div>
           <span className="text-sm text-gray-600">Remember me</span>
         </div>
@@ -87,7 +96,7 @@ export default function Auth() {
           <div className="flex-grow border-t border-gray-300"></div>
         </div>
 
-        <GoogleButton text="Sign in with Google" />
+        <GoogleButton text="Sign in with Google" onClick={() => navigate('/dashboard')} />
 
         <p className="text-center text-sm text-gray-600 mt-6">
           Don't have an account? <button type="button" onClick={() => setView('register')} className="text-blue-800 font-semibold hover:underline">Sign up here</button>
@@ -103,8 +112,8 @@ export default function Auth() {
         <User className="h-8 w-8 text-blue-400 fill-blue-200" />
       </div>
       
-      <div className="space-y-5">
-        <GoogleButton text="Continue with Google" />
+      <form onSubmit={(e) => { e.preventDefault(); navigate('/dashboard'); }} className="space-y-5">
+        <GoogleButton text="Continue with Google" onClick={() => navigate('/dashboard')} />
         
         <div className="relative flex py-2 items-center">
           <div className="flex-grow border-t border-gray-300"></div>
@@ -122,43 +131,40 @@ export default function Auth() {
         </div>
         
         <div className="flex items-start gap-2 pt-2">
-          <input type="checkbox" className="mt-1 w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-600" />
+          <input type="checkbox" required className="mt-1 w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-600" />
           <span className="text-sm text-gray-600">The following details belong to this email.</span>
         </div>
 
-        <button className="w-full bg-[#0a2a5c] text-white rounded-md py-3 font-semibold hover:bg-blue-900 transition-colors mt-2">
+        <button type="submit" className="w-full bg-[#0a2a5c] text-white rounded-md py-3 font-semibold hover:bg-blue-900 transition-colors mt-2">
           Create Account
         </button>
-        
-        <p className="text-xs text-gray-500 text-center leading-relaxed mt-4">
-          By creating an account, you are agree to the <a href="#" className="underline">Terms of Service</a> and <a href="#" className="underline">Privacy Policy</a>.
-        </p>
         
         <p className="text-center text-sm text-gray-600 mt-6">
           Already have an account? <button type="button" onClick={() => setView('login')} className="text-blue-800 font-semibold hover:underline">Log in here</button>
         </p>
-      </div>
+      </form>
     </div>
   );
 
   const ForgotScreen = () => (
-    <div className="w-full flex flex-col items-center text-center">
-      <div className="flex items-center gap-3 mb-6 w-full justify-start">
-        <h2 className="text-2xl font-bold text-blue-900">Forgot password?</h2>
-        <User className="h-6 w-6 text-blue-400 fill-blue-200" />
-      </div>
-      <p className="text-gray-500 text-sm mb-8 text-left w-full">Enter your email and we'll send you a link to reset your password.</p>
-      
-      <div className="w-full text-left space-y-5">
-        <div>
-          <label className="block text-sm text-gray-600 mb-1.5">Email address</label>
-          <InputField type="email" placeholder="email@address.com" icon={Mail} />
+    <div className="w-full flex flex-col h-full justify-between">
+      <div>
+        <div className="flex items-center gap-3 mb-6">
+          <h2 className="text-2xl font-bold text-blue-900">Forgot password?</h2>
+          <User className="h-6 w-6 text-blue-400 fill-blue-200" />
         </div>
-        <button onClick={() => setView('check-email')} className="w-full bg-[#0a2a5c] text-white rounded-md py-3 font-semibold hover:bg-blue-900 transition-colors">
-          Reset Password
-        </button>
+        <p className="text-gray-500 text-sm mb-8">Enter your email and we'll send you a link to reset your password.</p>
+        
+        <div className="space-y-5">
+          <div>
+            <label className="block text-sm text-gray-600 mb-1.5">Email address</label>
+            <InputField type="email" placeholder="email@address.com" icon={Mail} />
+          </div>
+          <button onClick={() => setView('check-email')} className="w-full bg-[#0a2a5c] text-white rounded-md py-3 font-semibold hover:bg-blue-900 transition-colors">
+            Reset Password
+          </button>
+        </div>
       </div>
-      
       <button onClick={() => setView('login')} className="mt-24 text-sm text-gray-600 hover:underline">Go back to Sign In.</button>
     </div>
   );
@@ -167,15 +173,9 @@ export default function Auth() {
     <div className="w-full flex flex-col h-full justify-between">
       <div>
         <h2 className="text-2xl font-bold text-blue-900 mb-6">Check your email</h2>
-        <p className="text-gray-500 text-sm mb-6 leading-relaxed">
-          We have sent a password recovery instructions to your email address.
-        </p>
-        <p className="text-gray-500 text-sm mb-8 leading-relaxed">
-          Didn't receive the email? Check your spam folder or try to <a href="#" className="underline">Re-send the message</a>.
-        </p>
-        <button onClick={() => setView('login')} className="w-full bg-[#0a2a5c] text-white rounded-md py-3 font-semibold hover:bg-blue-900 transition-colors">
-          Go back to Sign In
-        </button>
+        <p className="text-gray-500 text-sm mb-6 leading-relaxed">We have sent a password recovery instructions to your email address.</p>
+        <p className="text-gray-500 text-sm mb-8 leading-relaxed">Didn't receive the email? Check your spam folder or try to <a href="#" className="underline">Re-send the message</a>.</p>
+        <button onClick={() => setView('login')} className="w-full bg-[#0a2a5c] text-white rounded-md py-3 font-semibold hover:bg-blue-900 transition-colors">Go back to Sign In</button>
       </div>
       <button onClick={() => setView('login')} className="mt-24 text-sm text-gray-600 hover:underline text-center w-full">Go back to Sign In.</button>
     </div>
@@ -185,10 +185,7 @@ export default function Auth() {
     <div className="w-full flex flex-col h-full justify-between">
       <div>
         <h2 className="text-2xl font-bold text-blue-900 mb-4">New password</h2>
-        <p className="text-gray-500 text-sm mb-6 leading-relaxed">
-          Your new password must be different from previously used one, and must have at least 8 characters.
-        </p>
-        
+        <p className="text-gray-500 text-sm mb-6 leading-relaxed">Your new password must be different from previously used one, and must have at least 8 characters.</p>
         <div className="space-y-4">
           <div>
             <label className="block text-sm text-gray-600 mb-1.5">New password</label>
@@ -198,46 +195,8 @@ export default function Auth() {
             <label className="block text-sm text-gray-600 mb-1.5">Confirm password</label>
             <InputField type="password" placeholder="••••••••••••" icon={Lock} />
           </div>
-          <button onClick={() => setView('login')} className="w-full bg-[#0a2a5c] text-white rounded-md py-3 font-semibold hover:bg-blue-900 transition-colors mt-2">
-            Reset Password
-          </button>
+          <button onClick={() => setView('login')} className="w-full bg-[#0a2a5c] text-white rounded-md py-3 font-semibold hover:bg-blue-900 transition-colors mt-2">Reset Password</button>
         </div>
-      </div>
-      <button onClick={() => setView('login')} className="mt-16 text-sm text-gray-600 hover:underline text-center w-full">Go back to Sign In.</button>
-    </div>
-  );
-
-  const VerifyScreen = () => (
-    <div className="w-full flex flex-col h-full justify-between">
-      <div>
-        <div className="flex items-center gap-2 mb-4">
-          <h2 className="text-2xl font-bold text-blue-900">Verify it's you</h2>
-          <User className="h-6 w-6 text-blue-400 fill-blue-200" />
-        </div>
-        <p className="text-gray-500 text-sm mb-6 leading-relaxed">
-          We just sent a six-digit code to ***453 phone number. Enter the code below to sign in.
-        </p>
-        
-        <div className="mb-6">
-          <label className="block text-sm text-gray-600 mb-2">Activation Code</label>
-          <div className="flex gap-2 items-center">
-            <input type="text" maxLength={1} className="w-12 h-12 text-center text-xl border border-gray-300 rounded-md focus:border-blue-600 outline-none" defaultValue="3" />
-            <input type="text" maxLength={1} className="w-12 h-12 text-center text-xl border border-gray-300 rounded-md focus:border-blue-600 outline-none" defaultValue="2" />
-            <input type="text" maxLength={1} className="w-12 h-12 text-center text-xl border border-gray-300 rounded-md focus:border-blue-600 outline-none" defaultValue="8" />
-            <span className="text-gray-400 font-bold mx-1">-</span>
-            <input type="text" maxLength={1} className="w-12 h-12 text-center text-xl border border-gray-300 rounded-md focus:border-blue-600 outline-none" defaultValue="3" />
-            <input type="text" maxLength={1} className="w-12 h-12 text-center text-xl border border-gray-300 rounded-md focus:border-blue-600 outline-none" defaultValue="1" />
-            <input type="text" maxLength={1} className="w-12 h-12 text-center text-xl border border-gray-300 rounded-md focus:border-blue-600 outline-none" defaultValue="0" />
-          </div>
-        </div>
-
-        <button onClick={() => setView('login')} className="w-full bg-[#0a2a5c] text-white rounded-md py-3 font-semibold hover:bg-blue-900 transition-colors">
-          Continue
-        </button>
-        
-        <p className="text-sm text-gray-500 mt-4">
-          Didn't receive the code? <a href="#" className="underline">Re-send.</a>
-        </p>
       </div>
       <button onClick={() => setView('login')} className="mt-16 text-sm text-gray-600 hover:underline text-center w-full">Go back to Sign In.</button>
     </div>
@@ -249,13 +208,14 @@ export default function Auth() {
         <div className="w-full lg:w-1/2 p-8 lg:p-12 flex flex-col justify-center relative">
           <div className="max-w-sm mx-auto w-full h-full flex flex-col justify-center">
             {view === 'login' && <LoginScreen />}
+            {view === 'register' && <RegisterScreen />}
             {view === 'forgot' && <ForgotScreen />}
             {view === 'check-email' && <CheckEmailScreen />}
             {view === 'reset-password' && <ResetPasswordScreen />}
-            {view === 'verify' && <VerifyScreen />}
           </div>
         </div>
 
+        {/* Right Side - Only shows on Login view */}
         {view === 'login' && (
           <div className="hidden lg:flex w-1/2 p-12 bg-white border-l border-gray-100 flex-col justify-center items-center">
              <div className="max-w-sm w-full">
