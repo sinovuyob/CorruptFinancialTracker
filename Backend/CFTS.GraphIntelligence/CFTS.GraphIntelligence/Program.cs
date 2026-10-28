@@ -1,8 +1,7 @@
 ﻿using CFTS.GraphIntelligence.Models;
 using CFTS.GraphIntelligence.Services;
 using Neo4j.Driver;
-
-
+using System.Text.Json;
 
 
 string credentialsPath =
@@ -62,6 +61,35 @@ try
     {
         Console.WriteLine(transaction);
     }
+
+    Console.WriteLine("\nFinancial Paths Between Companies:");
+
+
+    List<FinancialPath> financialPaths =
+        await graphService.GetFinancialPathsAsync("C001", "C003");
+
+    foreach (FinancialPath financialPath in financialPaths)
+    {
+        Console.WriteLine(
+            string.Join(" -> ", financialPath.Path)
+        );
+    }
+
+    Console.WriteLine("\nFinancial Paths in JSON Format:");
+
+    string financialPathsJson = JsonSerializer.Serialize(
+        financialPaths,
+        new JsonSerializerOptions
+        {
+            WriteIndented = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        }
+    );
+
+    Console.WriteLine(financialPathsJson);
+
+
+
 
 
     FinancialRiskService riskService = new FinancialRiskService(driver);
