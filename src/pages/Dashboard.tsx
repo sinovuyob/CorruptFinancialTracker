@@ -1,9 +1,18 @@
-import { Briefcase, AlertTriangle, Activity, Users, Search, LogOut, ShieldCheck } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Briefcase, AlertTriangle, Activity, Users, Search, LogOut, ShieldCheck, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { dashboardStats, recentAlerts } from '../mocks/dashboardData';
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const getIcon = (name: string) => {
     const props = { className: "w-6 h-6 text-blue-600" };
@@ -18,6 +27,15 @@ export default function Dashboard() {
     if (risk === 'HIGH') return 'bg-orange-100 text-orange-700 border-orange-200';
     return 'bg-yellow-100 text-yellow-700 border-yellow-200';
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center">
+        <Loader2 className="w-12 h-12 text-blue-600 animate-spin mb-4" />
+        <p className="text-gray-500 font-medium">Loading dashboard data...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -60,17 +78,26 @@ export default function Dashboard() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {dashboardStats.map((stat, index) => (
-            <div key={index} className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-500 mb-1">{stat.label}</p>
-                <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
+          {dashboardStats.map((stat, index) => {
+            const isClickable = stat.label === 'Total Cases';
+            return (
+              <div 
+                key={index} 
+                onClick={() => isClickable && navigate('/cases')}
+                className={`bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between ${
+                  isClickable ? 'cursor-pointer hover:border-blue-400 hover:shadow-md transition-all' : ''
+                }`}
+              >
+                <div>
+                  <p className="text-sm font-medium text-gray-500 mb-1">{stat.label}</p>
+                  <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
+                </div>
+                <div className="p-3 bg-blue-50 rounded-lg">
+                  {getIcon(stat.icon)}
+                </div>
               </div>
-              <div className="p-3 bg-blue-50 rounded-lg">
-                {getIcon(stat.icon)}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <div className="mb-8">
