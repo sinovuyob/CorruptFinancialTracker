@@ -2,16 +2,33 @@
 using CFTS.GraphIntelligence.Services;
 using Neo4j.Driver;
 
-Console.Write("Neo4j URI: ");
-string uri = Console.ReadLine()!;
 
-Console.Write("Neo4j username: ");
-string username = Console.ReadLine()!;
 
-Console.Write("Neo4j password: ");
-string password = ReadPassword();
 
-Console.WriteLine("\nTesting connection...");
+string credentialsPath =
+    Environment.GetEnvironmentVariable("NEO4J_CREDENTIALS_FILE")
+    ?? throw new Exception("Neo4j credentials file path is not configured.");
+
+string[] lines = File.ReadAllLines(credentialsPath);
+
+Dictionary<string, string> credentials = new Dictionary<string, string>();
+
+foreach (string line in lines)
+{
+string[] parts = line.Split('=', 2);
+
+if (parts.Length == 2)
+{
+credentials[parts[0].Trim()] = parts[1].Trim();
+}
+}
+
+string uri = credentials["NEO4J_URI"];
+string username = credentials["NEO4J_USERNAME"];
+string password = credentials["NEO4J_PASSWORD"];
+
+Console.WriteLine("Neo4j credentials loaded successfully!");
+
 
 try
 {
@@ -80,30 +97,4 @@ catch (Exception ex)
 {
     Console.WriteLine("Error type: " + ex.GetType().Name);
     Console.WriteLine("Error message: " + ex.Message);
-}
-
-static string ReadPassword()
-{
-    string password = "";
-
-    while (true)
-    {
-        ConsoleKeyInfo key = Console.ReadKey(intercept: true);
-
-        if (key.Key == ConsoleKey.Enter)
-            break;
-
-        if (key.Key == ConsoleKey.Backspace)
-        {
-            if (password.Length > 0)
-                password = password[..^1];
-
-            continue;
-        }
-
-        if (!char.IsControl(key.KeyChar))
-            password += key.KeyChar;
-    }
-
-    return password;
 }
