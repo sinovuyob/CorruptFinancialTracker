@@ -426,3 +426,8 @@ FodyWeavers.xsd
 
 # Official VS Code C# Dev Kit Extension exclusion
 #*.lscache
+
+# Ignore generated files in all C# projects
+**/bin/
+**/obj/
+**/.vs/

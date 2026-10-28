@@ -26,4 +26,11 @@ public class Transaction
 
     public int? CompanyId { get; set; }
     public Company? Company { get; set; }
+
+    public int? SenderCompanyId { get; set; }
+    public Company? SenderCompany { get; set; }
+
+    public int? ReceiverCompanyId { get; set; }
+    public Company? ReceiverCompany { get; set; }
+
 }

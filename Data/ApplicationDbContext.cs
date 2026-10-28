@@ -35,6 +35,18 @@ public class ApplicationDbContext : DbContext
             .HasForeignKey(t => t.CompanyId)
             .OnDelete(DeleteBehavior.SetNull);
 
+        modelBuilder.Entity<Transaction>()
+            .HasOne(t => t.SenderCompany)
+            .WithMany()
+            .HasForeignKey(t => t.SenderCompanyId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<Transaction>()
+            .HasOne(t => t.ReceiverCompany)
+            .WithMany()
+            .HasForeignKey(t => t.ReceiverCompanyId)
+            .OnDelete(DeleteBehavior.NoAction);
+
         modelBuilder.Entity<Property>()
             .HasOne(p => p.Person)
             .WithMany()

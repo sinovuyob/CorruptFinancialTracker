@@ -20,4 +20,8 @@ public class CreateTransactionDto
 
     public int? PersonId { get; set; }
     public int? CompanyId { get; set; }
+
+    public int? SenderCompanyId { get; set; }
+    public int? ReceiverCompanyId { get; set; }
+
 }

@@ -28,6 +28,15 @@ public class TransactionService : ITransactionService
             !await _db.Companies.AnyAsync(c => c.CompanyId == dto.CompanyId))
             return null;
 
+        if (dto.SenderCompanyId.HasValue &&
+            !await _db.Companies.AnyAsync(c => c.CompanyId == dto.SenderCompanyId))
+            return null;
+
+        if (dto.ReceiverCompanyId.HasValue &&
+            !await _db.Companies.AnyAsync(c => c.CompanyId == dto.ReceiverCompanyId))
+            return null;
+
+
         var transaction = new Transaction
         {
             Amount = dto.Amount,
@@ -35,8 +44,11 @@ public class TransactionService : ITransactionService
             TransactionType = dto.TransactionType,
             TransactionDate = dto.TransactionDate,
             Description = dto.Description,
+
             PersonId = dto.PersonId,
-            CompanyId = dto.CompanyId
+            CompanyId = dto.CompanyId,
+            SenderCompanyId = dto.SenderCompanyId,
+            ReceiverCompanyId = dto.ReceiverCompanyId
         };
 
         _db.Transactions.Add(transaction);
@@ -57,6 +69,15 @@ public class TransactionService : ITransactionService
             !await _db.Companies.AnyAsync(c => c.CompanyId == dto.CompanyId))
             return false;
 
+        if (dto.SenderCompanyId.HasValue &&
+            !await _db.Companies.AnyAsync(c => c.CompanyId == dto.SenderCompanyId))
+            return false;
+
+        if (dto.ReceiverCompanyId.HasValue &&
+            !await _db.Companies.AnyAsync(c => c.CompanyId == dto.ReceiverCompanyId))
+            return false;
+
+
         transaction.Amount = dto.Amount;
         transaction.Currency = dto.Currency;
         transaction.TransactionType = dto.TransactionType;
@@ -64,6 +85,10 @@ public class TransactionService : ITransactionService
         transaction.Description = dto.Description;
         transaction.PersonId = dto.PersonId;
         transaction.CompanyId = dto.CompanyId;
+
+        transaction.SenderCompanyId = dto.SenderCompanyId;
+        transaction.ReceiverCompanyId = dto.ReceiverCompanyId;
+
 
         await _db.SaveChangesAsync();
         return true;
