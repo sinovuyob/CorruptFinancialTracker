@@ -1,0 +1,6 @@
+@CFTS_CorruptFinancialTracking_HostAddress = http://localhost:5065
+
+GET {{CFTS_CorruptFinancialTracking_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
