@@ -73,6 +73,7 @@ namespace CFTS.GraphIntelligence.Services
         }
 
 
+
         public async Task<List<FinancialPath>> GetFinancialPathsAsync(
             string startingCompanyId,
             string endingCompanyId)
