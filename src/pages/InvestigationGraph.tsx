@@ -79,38 +79,35 @@ export default function InvestigationGraph() {
           }
         }
       ],
-      layout: {
-        name: 'cose',
-        padding: 50
-      }
+      // Adjusted layout to spread the nodes out nicely like your screenshot
+      layout: { name: 'cose', padding: 80, idealEdgeLength: 120 }
     });
 
-    cy.on('tap', 'node', () => {
-      navigate('/risk');
+    cy.on('tap', 'node', (evt) => {
+      const nodeName = evt.target.data('label');
+      navigate(`/risk?entity=${encodeURIComponent(nodeName)}`);
     });
 
     return () => cy.destroy();
   }, [navigate]);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <header className="bg-white border-b border-gray-200 px-8 py-4 flex items-center gap-4">
-        <button 
-          onClick={() => navigate('/dashboard')}
-          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-        >
-          <ArrowLeft className="w-5 h-5 text-gray-600" />
+    <div className="min-h-screen bg-transparent flex flex-col">
+      <header className="bg-white/95 backdrop-blur-sm border-b border-gray-200 px-8 py-4 flex items-center gap-4 shadow-sm">
+        <button onClick={() => navigate('/dashboard')} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+          <ArrowLeft className="w-5 h-5 text-blue-900" />
         </button>
         <div>
-          <h1 className="text-lg font-bold text-gray-900">Investigation Graph</h1>
+          <h1 className="text-lg font-bold text-blue-900">Investigation Graph</h1>
           <p className="text-xs text-gray-500">Case #8821 - Suspicious Money Laundering</p>
         </div>
       </header>
 
-      <main className="flex-1 p-8">
+      {/* Reduced max-w to 5xl and height to 600px to match your reference image */}
+      <main className="flex-1 p-8 max-w-5xl mx-auto w-full mt-4">
         <div 
           ref={containerRef} 
-          className="w-full h-[700px] bg-white border border-gray-200 rounded-xl shadow-sm"
+          className="w-full h-[600px] bg-white border border-gray-200 rounded-2xl shadow-lg" 
         />
       </main>
     </div>

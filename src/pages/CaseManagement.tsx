@@ -9,6 +9,7 @@ export default function CaseManagement() {
   const [isCreating, setIsCreating] = useState(false);
   const [newTitle, setNewTitle] = useState('');
   const [newDesc, setNewDesc] = useState('');
+  const [newStatus, setNewStatus] = useState('OPEN');
 
   const handleCreateCase = (e: React.FormEvent) => {
     e.preventDefault();
@@ -16,7 +17,7 @@ export default function CaseManagement() {
       id: `CASE-${Math.floor(1000 + Math.random() * 9000)}`,
       title: newTitle,
       description: newDesc,
-      status: 'OPEN',
+      status: newStatus,
       date: new Date().toISOString().split('T')[0],
       lead: 'Inspector J. Mokoena'
     };
@@ -24,6 +25,11 @@ export default function CaseManagement() {
     setIsCreating(false);
     setNewTitle('');
     setNewDesc('');
+    setNewStatus('OPEN');
+  };
+
+  const handleStatusChange = (id: string, newStatus: string) => {
+    setCases(cases.map(c => c.id === id ? { ...c, status: newStatus } : c));
   };
 
   const getStatusIcon = (status: string) => {
@@ -39,57 +45,46 @@ export default function CaseManagement() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <header className="bg-white border-b border-gray-200 px-8 py-4 flex justify-between items-center">
+    <div className="min-h-screen bg-transparent flex flex-col">
+      <header className="bg-white/95 backdrop-blur-sm border-b border-gray-200 px-8 py-4 flex justify-between items-center shadow-sm">
         <div className="flex items-center gap-4">
           <button onClick={() => navigate('/dashboard')} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-            <ArrowLeft className="w-5 h-5 text-gray-600" />
+            <ArrowLeft className="w-5 h-5 text-blue-900" />
           </button>
           <div>
-            <h1 className="text-lg font-bold text-gray-900">Case Management</h1>
+            <h1 className="text-lg font-bold text-blue-900">Case Management</h1>
             <p className="text-xs text-gray-500">Manage and track active investigations</p>
           </div>
         </div>
-        
-        <button 
-          onClick={() => setIsCreating(true)}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          Create Case
+        <button onClick={() => setIsCreating(true)} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors shadow-lg">
+          <Plus className="w-4 h-4" /> Create Case
         </button>
       </header>
 
-      <main className="flex-1 p-8 max-w-5xl mx-auto w-full">
-        
+      <main className="flex-1 p-8 max-w-5xl mx-auto w-full mt-4">
         {isCreating && (
-          <div className="bg-white p-6 rounded-xl border border-blue-200 shadow-md mb-8">
-            <h2 className="text-lg font-bold text-gray-900 mb-4">Create New Case</h2>
+          <div className="bg-white p-6 rounded-xl border border-blue-200 shadow-xl mb-8">
+            <h2 className="text-lg font-bold text-blue-900 mb-4">Create New Case</h2>
             <form onSubmit={handleCreateCase} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Case Title</label>
-                <input 
-                  type="text" 
-                  required
-                  value={newTitle}
-                  onChange={(e) => setNewTitle(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-blue-600"
-                  placeholder="e.g., Suspicious transactions in Gauteng"
-                />
+                <input type="text" required value={newTitle} onChange={(e) => setNewTitle(e.target.value)} className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-blue-600" placeholder="e.g., Suspicious transactions in Gauteng" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                <textarea 
-                  required
-                  value={newDesc}
-                  onChange={(e) => setNewDesc(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-blue-600 h-24 resize-none"
-                  placeholder="Brief description of the investigation..."
-                />
+                <textarea required value={newDesc} onChange={(e) => setNewDesc(e.target.value)} className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-blue-600 h-24 resize-none" placeholder="Brief description of the investigation..." />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Initial Status</label>
+                <select value={newStatus} onChange={(e) => setNewStatus(e.target.value)} className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-blue-600 bg-white">
+                  <option value="OPEN">OPEN</option>
+                  <option value="IN PROGRESS">IN PROGRESS</option>
+                  <option value="RESOLVED">RESOLVED</option>
+                </select>
               </div>
               <div className="flex justify-end gap-3 pt-2">
                 <button type="button" onClick={() => setIsCreating(false)} className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg">Cancel</button>
-                <button type="submit" className="px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg">Save Case</button>
+                <button type="submit" className="px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-md">Save Case</button>
               </div>
             </form>
           </div>
@@ -97,31 +92,39 @@ export default function CaseManagement() {
 
         <div className="space-y-4">
           {cases.map((c) => (
-            <div key={c.id} className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:border-blue-300 transition-colors cursor-pointer">
+            <div key={c.id} className="bg-white/95 backdrop-blur-sm p-6 rounded-xl border border-gray-200 shadow-lg hover:border-blue-400 transition-colors">
               <div className="flex justify-between items-start mb-2">
                 <div>
                   <span className="text-xs font-bold text-blue-600 tracking-wider">{c.id}</span>
-                  <h3 className="text-lg font-bold text-gray-900">{c.title}</h3>
+                  <h3 className="text-lg font-bold text-blue-900">{c.title}</h3>
                 </div>
                 <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${getStatusColor(c.status)}`}>
-                  {getStatusIcon(c.status)}
-                  {c.status}
+                  {getStatusIcon(c.status)} {c.status}
                 </div>
               </div>
               <p className="text-gray-600 text-sm mb-4">{c.description}</p>
               
-              <div className="flex items-center gap-6 text-xs text-gray-500 border-t border-gray-100 pt-3">
-                <span>Lead: <strong className="text-gray-700">{c.lead}</strong></span>
-                <span>Opened: <strong className="text-gray-700">{c.date}</strong></span>
+              <div className="flex items-center justify-between border-t border-gray-100 pt-4 mt-2">
+                <div className="flex items-center gap-6 text-xs text-gray-500">
+                  <span>Lead: <strong className="text-gray-700">{c.lead}</strong></span>
+                  <span>Opened: <strong className="text-gray-700">{c.date}</strong></span>
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold text-gray-500">Update Status:</span>
+                  <select 
+                    value={c.status} 
+                    onChange={(e) => handleStatusChange(c.id, e.target.value)}
+                    className="text-xs border border-gray-300 rounded-lg px-2 py-1.5 focus:outline-none focus:border-blue-600 bg-white cursor-pointer"
+                  >
+                    <option value="OPEN">OPEN</option>
+                    <option value="IN PROGRESS">IN PROGRESS</option>
+                    <option value="RESOLVED">RESOLVED</option>
+                  </select>
+                </div>
               </div>
             </div>
           ))}
-          
-          {cases.length === 0 && (
-             <div className="text-center py-12 text-gray-500">
-               No cases found. Click "Create Case" to start a new investigation.
-             </div>
-          )}
         </div>
       </main>
     </div>

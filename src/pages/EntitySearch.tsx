@@ -29,21 +29,18 @@ export default function EntitySearch() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <header className="bg-white border-b border-gray-200 px-8 py-4 flex items-center gap-4">
-        <button 
-          onClick={() => navigate('/dashboard')}
-          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-        >
-          <ArrowLeft className="w-5 h-5 text-gray-600" />
+    <div className="min-h-screen bg-transparent flex flex-col">
+      <header className="bg-white/95 backdrop-blur-sm border-b border-gray-200 px-8 py-4 flex items-center gap-4 shadow-sm">
+        <button onClick={() => navigate('/dashboard')} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+          <ArrowLeft className="w-5 h-5 text-blue-900" />
         </button>
         <div>
-          <h1 className="text-lg font-bold text-gray-900">Entity Search</h1>
+          <h1 className="text-lg font-bold text-blue-900">Entity Search</h1>
           <p className="text-xs text-gray-500">Search across all linked records</p>
         </div>
       </header>
 
-      <main className="flex-1 p-8 max-w-5xl mx-auto w-full">
+      <main className="flex-1 p-8 max-w-5xl mx-auto w-full mt-4">
         <div className="mb-6 relative">
           <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
             <Search className="h-5 w-5 text-gray-400" />
@@ -53,7 +50,7 @@ export default function EntitySearch() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search by name, ID, or registration number..."
-            className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all shadow-sm"
+            className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all shadow-sm bg-white"
           />
         </div>
 
@@ -63,7 +60,7 @@ export default function EntitySearch() {
               key={cat}
               onClick={() => setActiveCategory(cat)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
-                activeCategory === cat ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+                activeCategory === cat ? 'bg-blue-600 text-white' : 'bg-white/90 backdrop-blur-sm text-gray-600 border border-gray-200 hover:bg-white'
               }`}
             >
               {cat}
@@ -71,29 +68,29 @@ export default function EntitySearch() {
           ))}
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-sm font-bold text-gray-900">Results ({filteredEntities.length})</h3>
+        <div className="bg-white/95 backdrop-blur-sm rounded-xl border border-gray-200 shadow-lg overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
+            <h3 className="text-sm font-bold text-blue-900">Results ({filteredEntities.length})</h3>
           </div>
           <div className="divide-y divide-gray-100">
             {filteredEntities.map((entity) => (
               <div 
                 key={entity.id} 
                 onClick={() => navigate('/graph')}
-                className="px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors cursor-pointer"
+                className="px-6 py-4 flex items-center justify-between hover:bg-blue-50 transition-colors cursor-pointer"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center border border-blue-100">
                     {getIcon(entity.type)}
                   </div>
                   <div>
-                    <p className="font-medium text-gray-900">{entity.name}</p>
-                    <p className="text-xs text-gray-500">{entity.type} • {entity.identifier}</p>
+                    <p className="font-bold text-blue-900">{entity.name}</p>
+                    <p className="text-xs text-gray-500 font-medium">{entity.type} • {entity.identifier}</p>
                   </div>
                 </div>
                 
                 <div className="flex items-center gap-6">
-                  <span className="text-sm font-semibold text-gray-700">{entity.value}</span>
+                  <span className="text-sm font-bold text-gray-700">{entity.value}</span>
                   <span className={`px-3 py-1 rounded-full text-xs font-bold border ${getRiskColor(entity.risk)}`}>
                     {entity.risk}
                   </span>
@@ -102,7 +99,7 @@ export default function EntitySearch() {
             ))}
             
             {filteredEntities.length === 0 && (
-              <div className="px-6 py-12 text-center text-gray-500">
+              <div className="px-6 py-12 text-center text-gray-500 font-medium">
                 No entities found matching your search.
               </div>
             )}
