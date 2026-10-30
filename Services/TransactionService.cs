@@ -7,9 +7,18 @@ namespace CorruptFinancialTracker.API.Services;
 
 public class TransactionService : ITransactionService
 {
-    private readonly ApplicationDbContext _db;
 
-    public TransactionService(ApplicationDbContext db) => _db = db;
+    private readonly ApplicationDbContext _db;
+    private readonly Neo4jTransactionSyncService _syncService;
+
+    public TransactionService(
+        ApplicationDbContext db,
+        Neo4jTransactionSyncService syncService)
+    {
+        _db = db;
+        _syncService = syncService;
+    }
+
 
     public Task<List<Transaction>> GetAllAsync() =>
         _db.Transactions.AsNoTracking().ToListAsync();
@@ -51,9 +60,32 @@ public class TransactionService : ITransactionService
             ReceiverCompanyId = dto.ReceiverCompanyId
         };
 
+
         _db.Transactions.Add(transaction);
         await _db.SaveChangesAsync();
+
+        if (transaction.SenderCompanyId.HasValue &&
+            transaction.ReceiverCompanyId.HasValue)
+        {
+            try
+            {
+                bool synced = await _syncService.SyncTransactionAsync(transaction.TransactionId);
+
+                if (!synced)
+                {
+                    Console.WriteLine(
+                        $"Neo4j synchronization skipped for transaction {transaction.TransactionId}.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(
+                    $"Neo4j synchronization failed for transaction {transaction.TransactionId}: {ex.Message}");
+            }
+        }
+
         return transaction;
+
     }
 
     public async Task<bool> UpdateAsync(int id, CreateTransactionDto dto)
@@ -91,8 +123,34 @@ public class TransactionService : ITransactionService
 
 
         await _db.SaveChangesAsync();
+
+        try
+        {
+            if (transaction.SenderCompanyId.HasValue &&
+                transaction.ReceiverCompanyId.HasValue)
+            {
+                bool synced = await _syncService.SyncTransactionAsync(id);
+
+                if (!synced)
+                {
+                    Console.WriteLine(
+                        $"Neo4j update synchronization skipped for transaction {id}.");
+                }
+            }
+            else
+            {
+                await _syncService.DeleteTransactionAsync(id);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(
+                $"Neo4j update synchronization failed for transaction {id}: {ex.Message}");
+        }
+
         return true;
     }
+
 
     public async Task<bool> DeleteAsync(int id)
     {
@@ -101,6 +159,18 @@ public class TransactionService : ITransactionService
 
         _db.Transactions.Remove(transaction);
         await _db.SaveChangesAsync();
+
+        try
+        {
+            await _syncService.DeleteTransactionAsync(id);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(
+                $"Neo4j deletion failed for transaction {id}: {ex.Message}");
+        }
+
         return true;
     }
+
 }

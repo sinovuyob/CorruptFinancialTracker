@@ -12,6 +12,11 @@
 		<Compile Remove="Backend\CFTS.GraphIntelligence\**\*.cs" />
 	</ItemGroup>
 
+
+	<ItemGroup>
+	  <None Include="CFTS.GraphIntelligence.csproj" />
+	</ItemGroup>
+
 	<ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.33">
       <PrivateAssets>all</PrivateAssets>
@@ -24,5 +29,9 @@
     </PackageReference>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.3.1" />
   </ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="Backend\CFTS.GraphIntelligence\CFTS.GraphIntelligence\CFTS.GraphIntelligence.csproj" />
+	</ItemGroup>
 
 </Project>
